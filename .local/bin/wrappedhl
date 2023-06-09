@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # wrappedhl
 # Launch Hyprland with a simple wrapper
+# Follow https://github.com/raminsamadi123/hyprinstall
 
 cd ~
 

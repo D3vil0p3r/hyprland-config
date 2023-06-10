@@ -1,17 +1,38 @@
 #!/usr/bin/env bash
 # wrappedhl
 # Launch Hyprland with a simple wrapper
-# Follow https://github.com/raminsamadi123/hyprinstall
 
+gpudetect=$(lspci -k | grep -A 0 -E "(VGA compatible|3D)")
+detect_virt=$(systemd-detect-virt)
 cd ~
 
 # Variables
 export _JAVA_AWT_WM_NONREPARENTING=1
 export XCURSOR_SIZE=24
 
-##### For VMware #####
-export WLR_NO_HARDWARE_CURSORS=1
-export WLR_RENDERER_ALLOW_SOFTWARE=1
+##### For NVIDIA #####
+if [[ $gpudetect =~ "NVIDIA" ]]; then
+  export LIBVA_DRIVER_NAME=nvidia
+  export XDG_SESSION_TYPE=wayland
+  export GBM_BACKEND=nvidia-drm
+  export __GLX_VENDOR_LIBRARY_NAME=nvidia
+  export WLR_NO_HARDWARE_CURSORS=1
+  export CURSOR_INACTIVE_TIMEOUT=0
+fi
+######################
+
+##### For VM (except QEMU due to GPU Passthrough?) #####
+if [ $detect_virt = "kvm" ] || [ $detect_virt = "oracle" ] || [ $detect_virt = "vmware" ]; then
+  export XDG_SESSION_TYPE=wayland
+  export LIBSEAT_BACKEND=logind
+  export MOZ_ENABLE_WAYLAND=1
+  export WLR_NO_HARDWARE_CURSORS=1
+  export WLR_RENDERER_ALLOW_SOFTWARE=1 Hyprland
+  export QT_QPA_PLATFORM=wayland
+  export QT_QPA_PLATFORMTHEME=gtk2
+  export SDL_VIDEODRIVER=wayland
+  export CLUTTER_BACKEND=wayland
+fi
 ######################
 
 # Execute Hyprland
